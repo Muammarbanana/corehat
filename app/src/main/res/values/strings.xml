@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">CoRehat</string>
+    <string name="nama_pengguna">Nama Pengguna</string>
+    <string name="masukkan_nama_pengguna">Masukkan nama pengguna</string>
+    <string name="kata_sandi">Kata Sandi</string>
+    <string name="masukkan_kata_sandi">Masukkan kata sandi</string>
+    <string name="lupa_kata_sandi">Lupa Kata Sandi?</string>
+    <string name="login">Login</string>
+    <string name="halo">Halo,</string>
+    <string name="selamat_datang_kembali">Selamat Datang Kembali</string>
+</resources>
