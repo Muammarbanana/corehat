@@ -11,6 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="konsultasi fragment"
-        android:textColor="@color/colorBlack" />
+        android:textColor="@android:color/black" />
 
 </FrameLayout>
