@@ -15,5 +15,10 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name= "android:screenOrientation" > portrait </item>
     </style>
+    <style name="Widget.BottomNavigationView"
+        parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/montserrat_regular</item>
+        <item name="android:textSize">10sp</item>
+    </style>
 
 </resources>

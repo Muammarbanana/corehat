@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/jadwalMenu"
+        android:icon="@drawable/ic_jadwal_konsultasi"
+        android:title="Jadwal"
+        />
+
+    <item
+        android:id="@+id/konsultasiMenu"
+        android:icon="@drawable/ic_konsultasi_online"
+        android:title="Konsultasi Online"
+        />
+
+    <item
+        android:id="@+id/profileMenu"
+        android:icon="@drawable/ic_profile_saya"
+        android:title="Profile Saya"
+        />
+</menu>
