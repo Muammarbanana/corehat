@@ -1,9 +1,11 @@
 package com.example.corehat.rvjanji
 
+import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.corehat.Approval
 import com.example.corehat.R
 import kotlinx.android.synthetic.main.list_janji.view.*
 
@@ -41,6 +43,12 @@ class AdapterJanji(private val list:ArrayList<Janji>): androidx.recyclerview.wid
             }
         }
         holder.view.teksJam.text = list[position].jam
+        holder.view.cardJanji.setOnClickListener {
+            if (list[position].status == 0 || list[position].status == 1) {
+                var intent = Intent(holder.view.context, Approval::class.java)
+                holder.view.context.startActivity(intent)
+            }
+        }
     }
 
 }

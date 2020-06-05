@@ -6,4 +6,6 @@
     <color name="colorGray">#B5B3BF</color>
     <color name="colorBack">#FAFBFC</color>
     <color name="colorDarkBlue">#172B4D</color>
+    <color name="colorLightOrange">#FFE5C3</color>
+    <color name="colroDarkOrange">#FF9000</color>
 </resources>
