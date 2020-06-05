@@ -1,14 +1,21 @@
 package com.example.corehat.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.corehat.R
 import com.example.corehat.rvhari.Adapter
 import com.example.corehat.rvhari.Hari
+import com.example.corehat.rvjanji.AdapterJanji
+import com.example.corehat.rvjanji.Janji
+import com.example.corehat.viewmodel.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -25,7 +32,9 @@ class HomeFragment : Fragment() {
 
     private lateinit var root: View
     private lateinit var ref: DatabaseReference
+    private lateinit var ref2: DatabaseReference
     private lateinit var auth: FirebaseAuth
+    private lateinit var viewModel: SharedViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,12 +48,25 @@ class HomeFragment : Fragment() {
         root.rvHari.setHasFixedSize(true)
         root.rvHari.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(root.context, LinearLayoutManager.HORIZONTAL, false)
 
+        root.rvJanji.setHasFixedSize(true)
+        root.rvJanji.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(root.context, LinearLayoutManager.VERTICAL, false)
+
+        viewModel = activity?.run {
+            ViewModelProviders.of(this)[SharedViewModel::class.java]
+        } ?: throw Exception("Invalid Activity")
+
         val cal = Calendar.getInstance()
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val today = formatter.format(cal.time)
         root.tanggalTeks.text = today
 
         getDataJadwal(auth.currentUser?.uid!!)
+
+        viewModel.data.observeForever(androidx.lifecycle.Observer {
+            when(it) {
+                "dayclicked" -> getDataJanji(auth.currentUser?.uid!!)
+            }
+        })
 
         return root
     }
@@ -62,14 +84,14 @@ class HomeFragment : Fragment() {
                 if (p0.exists()) {
                     for (h in p0.children) {
                         val hari = h.child("hari").value.toString()
-                        val jam = h.child("jam").value.toString()
                         daftarHari.add(Hari(hari, getDate(hari.toInt()), 0))
                     }
                     daftarHari = ArrayList(daftarHari.distinct())
                     daftarHari.sortBy { it.tanggal }
-                    val adapter = Adapter(ArrayList(daftarHari))
+                    val adapter = Adapter(daftarHari, viewModel)
                     adapter.notifyDataSetChanged()
                     root.rvHari.adapter = adapter
+                    getDataJanji(id)
                 }
             }
         })
@@ -90,5 +112,92 @@ class HomeFragment : Fragment() {
             c.add(Calendar.DAY_OF_MONTH, 1)
         }
         return finalDate
+    }
+
+    private fun getDataJanji(id: String) {
+        val listJanji = arrayListOf<Janji>()
+        val listJadwal = arrayListOf<Janji>()
+        ref = FirebaseDatabase.getInstance().getReference("janji")
+        ref.orderByChild("id_konselor").equalTo(id).addValueEventListener(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.exists()) {
+                    for (h in p0.children) {
+                        val idJanji = h.key.toString()
+                        val idKonselor = h.child("id_konselor").value.toString()
+                        val idUser = h.child("id_user").value.toString()
+                        val status = h.child("status").value.toString()
+                        val jam = h.child("jam").value.toString()
+                        val tanggal = h.child("tanggal").value.toString()
+                        listJanji.add(Janji(idJanji, idKonselor, idUser, status.toInt(), jam, tanggal))
+                    }
+                }
+                ref2 = FirebaseDatabase.getInstance().getReference("jadwal")
+                ref2.orderByChild("id_konselor").equalTo(id).addListenerForSingleValueEvent(object: ValueEventListener{
+                    override fun onCancelled(p1: DatabaseError) {  }
+
+                    override fun onDataChange(p1: DataSnapshot) {
+                        val jum = root.rvHari.adapter?.itemCount
+                        var teks: Int; var hari = ""; var tanggal = ""
+                        for (i in 0 until jum!!) {
+                            teks = root.rvHari
+                                .findViewHolderForAdapterPosition(i)
+                                ?.itemView
+                                ?.findViewById<TextView>(R.id.teksTanggal)
+                                ?.currentTextColor!!
+                            if (teks == -1) {
+                                hari = root.rvHari
+                                    .findViewHolderForAdapterPosition(i)
+                                    ?.itemView
+                                    ?.findViewById<TextView>(R.id.teksHari)
+                                    ?.text.toString()
+                                tanggal = root.rvHari
+                                    .findViewHolderForAdapterPosition(i)
+                                    ?.itemView
+                                    ?.findViewById<TextView>(R.id.teksTanggal)
+                                    ?.text.toString()
+                                break
+                            }
+                        }
+                        if (p1.exists()) {
+                            for (h in p1.children) {
+                                val clock = h.child("jam").value.toString()
+                                val day = h.child("hari").value.toString()
+                                if (hari == toDay(day.toInt())) {
+                                    Log.d("Panjang", listJanji.size.toString())
+                                    for (i in 0 until listJanji.size) {
+                                        if (tanggal == listJanji[i].tanggal && "$clock.00" == listJanji[i].jam) {
+                                            listJadwal.add(Janji(listJanji[i].id, listJanji[i].id_konselor, listJanji[i].id_user, listJanji[i].status, listJanji[i].jam, listJanji[i].tanggal))
+                                        } else {
+                                            listJadwal.add(Janji("0", "0", "0", 2, "$clock.00", ""))
+                                        }
+                                    }
+                                }
+                            }
+                            val adapter = AdapterJanji(listJadwal)
+                            adapter.notifyDataSetChanged()
+                            root.rvJanji.adapter = adapter
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    private fun toDay(value: Int): String {
+        var hari : String
+        when (value) {
+            1 -> hari = "Minggu"
+            2 -> hari = "Senin"
+            3 -> hari = "Selasa"
+            4 -> hari = "Rabu"
+            5 -> hari = "Kamis"
+            6 -> hari = "Jumat"
+            else -> hari = "Sabtu"
+        }
+        return hari
     }
 }

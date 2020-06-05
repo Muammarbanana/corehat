@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.corehat.R
+import com.example.corehat.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.list_hari.view.*
 import java.text.SimpleDateFormat
 
-class Adapter(private val list:ArrayList<Hari>): androidx.recyclerview.widget.RecyclerView.Adapter<Adapter.Holder>() {
+class Adapter(private val list:ArrayList<Hari>, private val viewModel: SharedViewModel): androidx.recyclerview.widget.RecyclerView.Adapter<Adapter.Holder>() {
 
-    private var selectedItemPosition = -1
+    private var selectedItemPosition = 0
 
     class Holder(val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
 
@@ -43,6 +44,7 @@ class Adapter(private val list:ArrayList<Hari>): androidx.recyclerview.widget.Re
         holder.view.teksTanggal.text = "$hari ${toMonth(bulan.toInt())}"
         holder.view.constHari.setOnClickListener {
             changeValueSelected(holder)
+            viewModel.datasend("dayclicked")
         }
     }
 

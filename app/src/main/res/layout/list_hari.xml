@@ -10,10 +10,7 @@
         android:layout_height="match_parent"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:backgroundTint="#F3F4FA"
-        app:cardCornerRadius="5dp"
-        app:strokeColor="@color/colorPrimary"
-        app:strokeWidth="1dp">
+        android:backgroundTint="#F3F4FA">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constHari"
