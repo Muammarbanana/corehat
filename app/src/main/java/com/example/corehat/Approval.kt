@@ -1,5 +1,6 @@
 package com.example.corehat
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.firebase.database.*
@@ -21,6 +22,12 @@ class Approval : AppCompatActivity() {
         userCatatan.text = catatan
 
         getDataUser(iduser)
+
+        btnTerima.setOnClickListener{
+            val intent = Intent(this, ApprovalConfirmation::class.java)
+            intent.putExtra("id", idjanji)
+            startActivity(intent)
+        }
 
         imgBackApproval.setOnClickListener { finish() }
     }

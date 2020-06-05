@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Approval"></activity>
+        <activity android:name=".ApprovalConfirmation"></activity>
+        <activity android:name=".Approval" />
         <activity
             android:name=".Home"
             android:theme="@style/AppThemeWhite" />
