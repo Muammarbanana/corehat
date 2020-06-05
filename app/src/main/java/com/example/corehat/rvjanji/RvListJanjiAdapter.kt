@@ -45,7 +45,10 @@ class AdapterJanji(private val list:ArrayList<Janji>): androidx.recyclerview.wid
         holder.view.teksJam.text = list[position].jam
         holder.view.cardJanji.setOnClickListener {
             if (list[position].status == 0 || list[position].status == 1) {
-                var intent = Intent(holder.view.context, Approval::class.java)
+                val intent = Intent(holder.view.context, Approval::class.java)
+                intent.putExtra("id", list[position].id)
+                intent.putExtra("id_user", list[position].id_user)
+                intent.putExtra("catatan", list[position].catatan)
                 holder.view.context.startActivity(intent)
             }
         }

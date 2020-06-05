@@ -132,7 +132,8 @@ class HomeFragment : Fragment() {
                         val status = h.child("status").value.toString()
                         val jam = h.child("jam").value.toString()
                         val tanggal = h.child("tanggal").value.toString()
-                        listJanji.add(Janji(idJanji, idKonselor, idUser, status.toInt(), jam, tanggal))
+                        val catatan = h.child("catatan").value.toString()
+                        listJanji.add(Janji(idJanji, idKonselor, idUser, status.toInt(), jam, tanggal, catatan))
                     }
                 }
                 ref2 = FirebaseDatabase.getInstance().getReference("jadwal")
@@ -170,9 +171,9 @@ class HomeFragment : Fragment() {
                                     Log.d("Panjang", listJanji.size.toString())
                                     for (i in 0 until listJanji.size) {
                                         if (tanggal == listJanji[i].tanggal && "$clock.00" == listJanji[i].jam) {
-                                            listJadwal.add(Janji(listJanji[i].id, listJanji[i].id_konselor, listJanji[i].id_user, listJanji[i].status, listJanji[i].jam, listJanji[i].tanggal))
+                                            listJadwal.add(Janji(listJanji[i].id, listJanji[i].id_konselor, listJanji[i].id_user, listJanji[i].status, listJanji[i].jam, listJanji[i].tanggal, listJanji[i].catatan))
                                         } else {
-                                            listJadwal.add(Janji("0", "0", "0", 2, "$clock.00", ""))
+                                            listJadwal.add(Janji("0", "0", "0", 2, "$clock.00", "", ""))
                                         }
                                     }
                                 }
