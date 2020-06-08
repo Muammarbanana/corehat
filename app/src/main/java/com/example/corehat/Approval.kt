@@ -1,8 +1,11 @@
 package com.example.corehat
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_approval.*
@@ -19,12 +22,36 @@ class Approval : AppCompatActivity() {
         val idjanji = intent.getStringExtra("id")
         val iduser = intent.getStringExtra("id_user")
         val catatan = intent.getStringExtra("catatan")
+        val status = intent.getStringExtra("status")
+        val namauser = intent.getStringExtra("namauser")
         userCatatan.text = catatan
+
+        if (status.toInt() == 1) {
+            toolbarApproval.setBackgroundColor(Color.parseColor("#C2FFC8"))
+            titleApproval.setTextColor(Color.parseColor("#1A8748"))
+            imgBackApproval.setImageResource(R.drawable.ic_small_arrow)
+            titleApproval.text = namauser
+            getDataJanji(idjanji)
+            imageView.visibility = View.VISIBLE
+            imageView2.visibility = View.VISIBLE
+            userTanggal.visibility = View.VISIBLE
+            userJam.visibility = View.VISIBLE
+            teksInginKonsul.visibility = View.GONE
+            btnTolak.visibility = View.GONE
+            btnTerima.visibility = View.GONE
+            btnSelesai.visibility = View.VISIBLE
+        }
 
         getDataUser(iduser)
 
         btnTerima.setOnClickListener{
             val intent = Intent(this, ApprovalConfirmation::class.java)
+            intent.putExtra("id", idjanji)
+            startActivity(intent)
+        }
+
+        btnTolak.setOnClickListener {
+            val intent = Intent(this, RefusalReason::class.java)
             intent.putExtra("id", idjanji)
             startActivity(intent)
         }
@@ -69,5 +96,21 @@ class Approval : AppCompatActivity() {
         birth.set(birthdate[2].toInt(), birthdate[1].toInt(), birthdate[0].toInt())
         val age = today.get(Calendar.YEAR) - birth.get(Calendar.YEAR)
         return "$age tahun"
+    }
+
+    private fun getDataJanji(id: String) {
+        ref = FirebaseDatabase.getInstance().getReference("janji")
+        ref.orderByKey().equalTo(id).addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {}
+
+            override fun onDataChange(p0: DataSnapshot) {
+                for (h in p0.children) {
+                    val tanggal = h.child("tanggal").value.toString()
+                    val jam = h.child("jam").value.toString()
+                    userTanggal.text = tanggal
+                    userJam.text = "$jam WIB"
+                }
+            }
+        })
     }
 }

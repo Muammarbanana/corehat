@@ -1,45 +1,43 @@
 package com.example.corehat
 
 import android.content.Intent
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.RadioButton
-import android.widget.Toast
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.android.synthetic.main.activity_approval_confirmation.*
+import kotlinx.android.synthetic.main.activity_refusal_reason.*
 
-class ApprovalConfirmation : AppCompatActivity() {
+class RefusalReason : AppCompatActivity() {
 
     private lateinit var ref: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_approval_confirmation)
+        setContentView(R.layout.activity_refusal_reason)
 
         val id = intent.getStringExtra("id")
 
-        btnKonfirmasi.setOnClickListener {
-            kirimKonfirmasi(id)
+        btnPenolakan.setOnClickListener {
+            kirimAlasanPenolakan(id)
         }
 
-        imgBackApprovalConfirmation.setOnClickListener { finish() }
+        imgBackRefusalConfirmation.setOnClickListener { finish() }
     }
 
-    private fun kirimKonfirmasi(id: String) {
+    private fun kirimAlasanPenolakan(id: String) {
         ref = FirebaseDatabase.getInstance().getReference("janji").child(id)
-        val idrg = rgApproval.checkedRadioButtonId
+        val idrg = rgRefusal.checkedRadioButtonId
         var pesan = ""
         if (idrg != -1) {
             val radio: RadioButton = findViewById(idrg)
-            if (radio == findViewById(R.id.radioButton4)) {
+            if (radio == findViewById(R.id.radioButton8)) {
                 pesan = editTextChoice.text.toString()
             } else {
                 pesan = radio.text.toString()
             }
             ref.child("pesan").setValue(pesan)
-            ref.child("status").setValue(1)
+            ref.child("status").setValue(3)
             var intent = Intent(this, Home::class.java)
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
