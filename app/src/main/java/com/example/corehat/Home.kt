@@ -56,6 +56,22 @@ class Home : AppCompatActivity() {
         })
     }
 
+    private fun getName() {
+        ref = FirebaseDatabase.getInstance().getReference("konselor")
+        ref.orderByKey().equalTo(auth.currentUser?.uid!!).addValueEventListener(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                for (h in p0.children) {
+                    val nama = h.child("nama").value.toString()
+                    title2.text = nama
+                }
+            }
+
+        })
+    }
+
     private fun selectedItem(item: MenuItem) {
         item.isChecked = true
         when(item.itemId) {
@@ -72,7 +88,7 @@ class Home : AppCompatActivity() {
             R.id.profileMenu -> {
                 selectedFragment(ProfilFragment())
                 title1.text = "Halo,"
-                title2.text = "NamaKonselor"
+                getName()
             }
         }
     }

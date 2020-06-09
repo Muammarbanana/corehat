@@ -6,9 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_approval_confirmation.*
+import kotlinx.android.synthetic.main.pop_alert.view.*
 
 class ApprovalConfirmation : AppCompatActivity() {
 
@@ -21,7 +23,7 @@ class ApprovalConfirmation : AppCompatActivity() {
         val id = intent.getStringExtra("id")
 
         btnKonfirmasi.setOnClickListener {
-            kirimKonfirmasi(id)
+            popAlert(id)
         }
 
         imgBackApprovalConfirmation.setOnClickListener { finish() }
@@ -45,5 +47,20 @@ class ApprovalConfirmation : AppCompatActivity() {
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         }
+    }
+
+    private fun popAlert(id: String) {
+        val dialog = AlertDialog.Builder(this).create()
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.pop_alert, null)
+        dialog.setView(dialogView)
+        dialog.setCancelable(true)
+        dialogView.alertText.text = "Apakah anda yakin ingin menerima permintaan konsultasinya?"
+        dialogView.btnCancel.setOnClickListener { dialog.dismiss() }
+        dialogView.btnAccept.setOnClickListener {
+            kirimKonfirmasi(id)
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 }

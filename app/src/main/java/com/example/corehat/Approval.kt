@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_approval.*
+import kotlinx.android.synthetic.main.pop_alert.view.*
 import java.util.*
 
 class Approval : AppCompatActivity() {
@@ -41,6 +43,9 @@ class Approval : AppCompatActivity() {
             btnTolak.visibility = View.GONE
             btnTerima.visibility = View.GONE
             btnSelesai.visibility = View.VISIBLE
+            btnSelesai.setOnClickListener {
+                popAlert(idjanji)
+            }
         }
 
         getDataUser(iduser)
@@ -113,5 +118,26 @@ class Approval : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun deleteJanji(id: String) {
+        ref = FirebaseDatabase.getInstance().getReference("janji")
+        ref.child(id).removeValue()
+    }
+
+    private fun popAlert(id: String) {
+        val dialog = AlertDialog.Builder(this).create()
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.pop_alert, null)
+        dialog.setView(dialogView)
+        dialog.setCancelable(true)
+        dialogView.alertText.text = "Apakah anda yakin?"
+        dialogView.btnCancel.setOnClickListener { dialog.dismiss() }
+        dialogView.btnAccept.setOnClickListener {
+            deleteJanji(id)
+            finish()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 }

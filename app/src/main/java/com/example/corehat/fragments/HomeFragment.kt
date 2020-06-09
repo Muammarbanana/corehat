@@ -124,6 +124,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun onDataChange(p0: DataSnapshot) {
+                listJanji.clear()
                 if (p0.exists()) {
                     for (h in p0.children) {
                         val idJanji = h.key.toString()
@@ -141,6 +142,7 @@ class HomeFragment : Fragment() {
                     override fun onCancelled(p1: DatabaseError) {  }
 
                     override fun onDataChange(p1: DataSnapshot) {
+                        listJadwal.clear()
                         val jum = root.rvHari.adapter?.itemCount
                         var teks: Int; var hari = ""; var tanggal = ""
                         for (i in 0 until jum!!) {
