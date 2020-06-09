@@ -74,7 +74,7 @@ class HomeFragment : Fragment() {
     private fun getDataJadwal(id: String) {
         var daftarHari = arrayListOf<Hari>()
         ref = FirebaseDatabase.getInstance().getReference("jadwal")
-        ref.orderByChild("id_konselor").equalTo(id).addListenerForSingleValueEvent(object:
+        ref.orderByChild("id_konselor").equalTo(id).addValueEventListener(object:
             ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
 
@@ -144,23 +144,25 @@ class HomeFragment : Fragment() {
                         val jum = root.rvHari.adapter?.itemCount
                         var teks: Int; var hari = ""; var tanggal = ""
                         for (i in 0 until jum!!) {
-                            teks = root.rvHari
-                                .findViewHolderForAdapterPosition(i)
-                                ?.itemView
-                                ?.findViewById<TextView>(R.id.teksTanggal)
-                                ?.currentTextColor!!
-                            if (teks == -1) {
-                                hari = root.rvHari
+                            if (root.rvHari.findViewHolderForAdapterPosition(i) != null) {
+                                teks = root.rvHari
                                     .findViewHolderForAdapterPosition(i)
                                     ?.itemView
                                     ?.findViewById<TextView>(R.id.teksHari)
-                                    ?.text.toString()
-                                tanggal = root.rvHari
-                                    .findViewHolderForAdapterPosition(i)
-                                    ?.itemView
-                                    ?.findViewById<TextView>(R.id.teksTanggal)
-                                    ?.text.toString()
-                                break
+                                    ?.currentTextColor!!
+                                if (teks == -1) {
+                                    hari = root.rvHari
+                                        .findViewHolderForAdapterPosition(i)
+                                        ?.itemView
+                                        ?.findViewById<TextView>(R.id.teksHari)
+                                        ?.text.toString()
+                                    tanggal = root.rvHari
+                                        .findViewHolderForAdapterPosition(i)
+                                        ?.itemView
+                                        ?.findViewById<TextView>(R.id.teksTanggal)
+                                        ?.text.toString()
+                                    break
+                                }
                             }
                         }
                         if (p1.exists()) {
@@ -168,14 +170,7 @@ class HomeFragment : Fragment() {
                                 val clock = h.child("jam").value.toString()
                                 val day = h.child("hari").value.toString()
                                 if (hari == toDay(day.toInt())) {
-                                    Log.d("Panjang", listJanji.size.toString())
-                                    for (i in 0 until listJanji.size) {
-                                        if (tanggal == listJanji[i].tanggal && "$clock.00" == listJanji[i].jam) {
-                                            listJadwal.add(Janji(listJanji[i].id, listJanji[i].id_konselor, listJanji[i].id_user, listJanji[i].status, listJanji[i].jam, listJanji[i].tanggal, listJanji[i].catatan))
-                                        } else {
-                                            listJadwal.add(Janji("0", "0", "0", 2, "$clock.00", "", ""))
-                                        }
-                                    }
+                                    listJadwal.add(getJanji(tanggal, clock, listJanji))
                                 }
                             }
                             val adapter = AdapterJanji(listJadwal)
@@ -200,5 +195,17 @@ class HomeFragment : Fragment() {
             else -> hari = "Sabtu"
         }
         return hari
+    }
+
+    private fun getJanji(tanggal: String, clock: String, listJanji: ArrayList<Janji>): Janji {
+        var janji = Janji("0", "0", "0", 2, "$clock.00", "", "")
+        for (counter in 0 until listJanji.size) {
+            if (tanggal == listJanji[counter].tanggal && "$clock.00" == listJanji[counter].jam) {
+                janji = Janji(listJanji[counter].id, listJanji[counter].id_konselor, listJanji[counter].id_user, listJanji[counter].status, listJanji[counter].jam, listJanji[counter].tanggal, listJanji[counter].catatan)
+                break
+            }
+            janji = Janji("0", "0", "0", 2, "$clock.00", "", "")
+        }
+        return janji
     }
 }

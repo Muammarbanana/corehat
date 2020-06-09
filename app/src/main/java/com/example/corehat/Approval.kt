@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.database.*
@@ -73,13 +74,13 @@ class Approval : AppCompatActivity() {
                         val photo = h.child("photo").value.toString()
                         val birth = h.child("birth").value.toString()
                         userName.text = name
-                        if (gender != "null" || gender != "") {
+                        if (gender != "null") {
                             userKelamin.text = gender
                         }
-                        if (photo != "null" || photo != "") {
+                        if (photo != "null") {
                             Picasso.get().load(photo).into(userPhoto)
                         }
-                        if (birth != "null" || birth != "") {
+                        if (birth != "null") {
                             val birthdate = birth.split("-").toTypedArray()
                             userUsia.text = getAge(birthdate)
                         }
