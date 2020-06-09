@@ -37,7 +37,7 @@ class RefusalReason : AppCompatActivity() {
                 pesan = radio.text.toString()
             }
             ref.child("pesan").setValue(pesan)
-            ref.child("status").setValue(3)
+            ref.child("status").setValue(2)
             var intent = Intent(this, Home::class.java)
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
