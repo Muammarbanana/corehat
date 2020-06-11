@@ -6,11 +6,8 @@
     android:background="@color/colorBack"
     tools:context=".fragments.KonsultasiFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvUserList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="konsultasi fragment"
-        android:textColor="@android:color/black" />
-
+        android:layout_height="match_parent" />
 </FrameLayout>
