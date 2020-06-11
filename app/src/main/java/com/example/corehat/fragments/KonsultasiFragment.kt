@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.corehat.R
+import com.example.corehat.model.User
 import com.example.corehat.rvuser.Adapter
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_konsultasi.*
@@ -37,7 +38,7 @@ class KonsultasiFragment : Fragment() {
     }
 
     private fun getDataPesanPengguna() {
-        val listUser = arrayListOf<String>()
+        val listUser = arrayListOf<User>()
         ref = FirebaseDatabase.getInstance().getReference("Users")
         ref.orderByKey().addValueEventListener(object: ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -49,7 +50,9 @@ class KonsultasiFragment : Fragment() {
                 if (p0.exists()) {
                     p0.children.forEach {
                         val nama = it.child("nama").value.toString()
-                        listUser.add(nama)
+                        val id = it.key.toString()
+                        val username = it.child("username").value.toString()
+                        listUser.add(User(id, username, nama))
                     }
                     val adapter = Adapter(listUser)
                     adapter.notifyDataSetChanged()
