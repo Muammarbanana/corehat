@@ -6,12 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.solver.widgets.ConstraintAnchor
+import androidx.constraintlayout.widget.ConstraintHelper
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.corehat.ChatKonsultasi
 import com.example.corehat.R
 import com.example.corehat.model.ChatMessage
 import com.example.corehat.model.User
-import com.example.corehat.rvuser.Adapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
@@ -61,6 +63,9 @@ class KonsultasiFragment : Fragment() {
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+                val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
+                latestMessageMap[p0.key!!] = chatMessage
+                refreshRecyclerViewMessage()
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
@@ -92,10 +97,29 @@ class ListUserChat(private val chatMessage: ChatMessage): Item<GroupieViewHolder
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.chatMessage.text = chatMessage.message
+        val timestampnow = System.currentTimeMillis()
+        val selisih = timestampnow - chatMessage.timestamp
+        viewHolder.itemView.chatWaktu.text = hitungWaktu(selisih)
 
-        val toId = chatMessage.fromId
+        val chatPartnerId: String
+        if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
+            chatPartnerId = chatMessage.toId
+            viewHolder.itemView.arrowChat.visibility = View.VISIBLE
+            val const = ConstraintSet()
+            const.clone(viewHolder.itemView.constListUserChat)
+            const.connect(R.id.chatMessage, ConstraintSet.START, R.id.arrowChat, ConstraintSet.END, 4)
+            const.applyTo(viewHolder.itemView.constListUserChat)
+        } else {
+            chatPartnerId = chatMessage.fromId
+            viewHolder.itemView.arrowChat.visibility = View.GONE
+            val const = ConstraintSet()
+            const.clone(viewHolder.itemView.constListUserChat)
+            const.connect(R.id.chatMessage, ConstraintSet.START, R.id.userPhoto, ConstraintSet.END, 16)
+            const.applyTo(viewHolder.itemView.constListUserChat)
+        }
+
         val ref = FirebaseDatabase.getInstance().getReference("Users")
-        ref.orderByKey().equalTo(toId).addValueEventListener(object: ValueEventListener{
+        ref.orderByKey().equalTo(chatPartnerId).addValueEventListener(object: ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
             }
 
@@ -114,8 +138,26 @@ class ListUserChat(private val chatMessage: ChatMessage): Item<GroupieViewHolder
         viewHolder.itemView.constListUserChat.setOnClickListener {
             val intent = Intent(viewHolder.itemView.context, ChatKonsultasi::class.java)
             intent.putExtra("Nama", viewHolder.itemView.chatNamaPengguna.text)
-            intent.putExtra("Id", chatMessage.fromId)
+            intent.putExtra("Id", chatPartnerId)
             viewHolder.itemView.context.startActivity(intent)
         }
+    }
+
+    private fun hitungWaktu(selisih: Long): String {
+        val hari = selisih/86400000
+        val jam = selisih/3600000
+        val menit = selisih/60000
+        val detik = selisih/1000
+        var hasil: String
+        if (selisih > 86400000) {
+            hasil = "$hari hari yang lalu"
+        } else if (selisih > 3600000) {
+            hasil = "$jam jam yang lalu"
+        } else if (selisih > 60000) {
+            hasil = "$menit menit yang lalu"
+        } else {
+            hasil = "$detik detik yang lalu"
+        }
+        return hasil
     }
 }

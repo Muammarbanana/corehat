@@ -106,7 +106,7 @@ class ChatKonsultasi : AppCompatActivity() {
     }
 
     private fun converToHours(timestamp: Long): String {
-        val sdf = SimpleDateFormat("hh.mm", Locale.getDefault())
+        val sdf = SimpleDateFormat("HH.mm", Locale.getDefault())
         val time = Date(timestamp)
         return sdf.format(time)
     }

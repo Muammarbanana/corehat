@@ -41,11 +41,13 @@
         android:id="@+id/chatMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
         android:fontFamily="@font/montserrat_regular"
         android:text="Pesan chat"
         android:textColor="@color/colorDarkBlue"
         android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/chatNamaPengguna"
+        app:layout_constraintStart_toEndOf="@+id/arrowChat"
         app:layout_constraintTop_toBottomOf="@+id/chatNamaPengguna" />
 
     <TextView
@@ -60,5 +62,15 @@
         app:layout_constraintStart_toStartOf="@+id/chatNamaPengguna"
         app:layout_constraintTop_toBottomOf="@+id/chatMessage"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/arrowChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/chatWaktu"
+        app:layout_constraintStart_toStartOf="@+id/chatNamaPengguna"
+        app:layout_constraintTop_toBottomOf="@+id/chatNamaPengguna"
+        app:layout_constraintVertical_bias="0.5"
+        app:srcCompat="@drawable/ic_right_arrow_chat" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
