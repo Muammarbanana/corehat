@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.corehat.R
 import com.example.corehat.model.User
 import com.example.corehat.rvuser.Adapter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_konsultasi.*
 import kotlinx.android.synthetic.main.fragment_konsultasi.view.*
@@ -39,27 +40,57 @@ class KonsultasiFragment : Fragment() {
 
     private fun getDataPesanPengguna() {
         val listUser = arrayListOf<User>()
-        ref = FirebaseDatabase.getInstance().getReference("Users")
-        ref.orderByKey().addValueEventListener(object: ValueEventListener {
+        val listIdUser = arrayListOf<String>()
+        val referensi = FirebaseDatabase.getInstance().getReference("messages")
+        referensi.orderByKey().equalTo(FirebaseAuth.getInstance().uid).addValueEventListener(object: ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
                 listUser.clear()
-                if (p0.exists()) {
-                    p0.children.forEach {
-                        val nama = it.child("nama").value.toString()
-                        val id = it.key.toString()
-                        val username = it.child("username").value.toString()
-                        listUser.add(User(id, username, nama))
+                listIdUser.clear()
+                if(p0.exists()) {
+                    p0.children.forEach {p1 ->
+                        p1.children.forEach {
+                            val iduser = it.key.toString()
+                            listIdUser.add(iduser)
+                        }
                     }
-                    val adapter = Adapter(listUser)
-                    adapter.notifyDataSetChanged()
-                    rvUserList.adapter = adapter
                 }
-            }
+                ref = FirebaseDatabase.getInstance().getReference("Users")
+                ref.orderByKey().addListenerForSingleValueEvent(object: ValueEventListener {
+                    override fun onCancelled(p0: DatabaseError) {
 
+                    }
+
+                    override fun onDataChange(p0: DataSnapshot) {
+                        if (p0.exists()) {
+                            p0.children.forEach {
+                                val nama = it.child("nama").value.toString()
+                                val id = it.key.toString()
+                                val username = it.child("username").value.toString()
+                                val photo = it.child("photo").value.toString()
+                                listUser.add(User(id, username, nama, photo))
+                            }
+                            var count = 0
+                            val listUserFiltered = arrayListOf<User>()
+                            for (h in listUser) {
+                                for (g in listIdUser) {
+                                    if (h.id == g) {
+                                        listUserFiltered.add(h)
+                                    }
+                                    break
+                                }
+                                count += 1
+                            }
+                            val adapter = Adapter(listUserFiltered)
+                            adapter.notifyDataSetChanged()
+                            rvUserList.adapter = adapter
+                        }
+                    }
+                })
+            }
         })
     }
 

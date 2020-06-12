@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.example.corehat.ChatKonsultasi
 import com.example.corehat.R
 import com.example.corehat.model.User
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.list_user_chat.view.*
 
 class Adapter(private val list: ArrayList<User>) : androidx.recyclerview.widget.RecyclerView.Adapter<Adapter.Holder>() {
@@ -25,6 +26,9 @@ class Adapter(private val list: ArrayList<User>) : androidx.recyclerview.widget.
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.view.chatNamaPengguna.text = list[position].name
+        if (list[position].photo != "null") {
+            Picasso.get().load(list[position].photo).into(holder.view.userPhoto)
+        }
         holder.view.constListUserChat.setOnClickListener{
             val intent = Intent(holder.view.context, ChatKonsultasi::class.java)
             intent.putExtra("Nama", list[position].name)
