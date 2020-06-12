@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.chat_from.view.*
 import kotlinx.android.synthetic.main.chat_from.view.chatime
 import kotlinx.android.synthetic.main.chat_from.view.teksChat
 import kotlinx.android.synthetic.main.chat_to.view.*
+import kotlinx.android.synthetic.main.date_header.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -72,6 +73,7 @@ class ChatKonsultasi : AppCompatActivity() {
         val fromId = FirebaseAuth.getInstance().uid
         val toId = intent.getStringExtra("Id")
         val ref = FirebaseDatabase.getInstance().getReference("messages/$fromId/$toId")
+        var date = ""
         ref.addChildEventListener(object: ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {
 
@@ -89,11 +91,16 @@ class ChatKonsultasi : AppCompatActivity() {
                 val chatmessage = p0.getValue(ChatMessage::class.java)
 
                 if (chatmessage != null) {
+
+                    if (date != convertToDate(Date(chatmessage.timestamp))) {
+                        adapter.add(DateItem(convertToDate(Date(chatmessage.timestamp))))
+                    }
                     if (chatmessage.fromId == FirebaseAuth.getInstance().uid) {
                         adapter.add(ChatToItem(chatmessage.message, converToHours(chatmessage.timestamp)))
                     } else {
                         adapter.add(ChatFromItem(chatmessage.message, converToHours(chatmessage.timestamp)))
                     }
+                    date = convertToDate(Date(chatmessage.timestamp))
                 }
             }
 
@@ -109,6 +116,21 @@ class ChatKonsultasi : AppCompatActivity() {
         val sdf = SimpleDateFormat("HH.mm", Locale.getDefault())
         val time = Date(timestamp)
         return sdf.format(time)
+    }
+
+    private fun convertToDate(timestamp: Date): String {
+        var datevalue: String
+        val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        val sdf2 = SimpleDateFormat("dd", Locale.getDefault())
+        val currentdate = Calendar.getInstance().time
+        if (sdf.format(currentdate) == sdf.format(timestamp)) {
+            datevalue = "Hari Ini"
+        } else if (sdf2.format(timestamp).toInt() == sdf2.format(currentdate).toInt() - 1) {
+            datevalue = "Kemarin"
+        } else {
+            datevalue = sdf.format(timestamp)
+        }
+        return datevalue
     }
 }
 
@@ -132,6 +154,17 @@ class ChatToItem(val text: String, val time: String): Item<GroupieViewHolder>() 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.teksChatTo.text = text
         viewHolder.itemView.chatimeTo.text = time
+    }
+
+}
+
+class DateItem(val text: String): Item<GroupieViewHolder>() {
+    override fun getLayout(): Int {
+        return R.layout.date_header
+    }
+
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.teksTanggal.text = text
     }
 
 }
