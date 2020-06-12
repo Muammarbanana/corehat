@@ -53,6 +53,7 @@ class Approval : AppCompatActivity() {
         btnTerima.setOnClickListener{
             val intent = Intent(this, ApprovalConfirmation::class.java)
             intent.putExtra("id", idjanji)
+            intent.putExtra("iduser", iduser)
             startActivity(intent)
         }
 
