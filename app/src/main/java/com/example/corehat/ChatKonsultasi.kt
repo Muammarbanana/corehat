@@ -56,12 +56,16 @@ class ChatKonsultasi : AppCompatActivity() {
         val timestamp = System.currentTimeMillis()
         val ref = FirebaseDatabase.getInstance().getReference("messages/$fromId/$toId")
         val toref = FirebaseDatabase.getInstance().getReference("messages/$toId/$fromId")
+        val latestFromRef = FirebaseDatabase.getInstance().getReference("latest_messages/$fromId/$toId")
+        val latestToRef = FirebaseDatabase.getInstance().getReference("latest_messages/$toId/$fromId")
         val chatmessage = ChatMessage(fromId!!, toId, message, timestamp)
         ref.push().setValue(chatmessage).addOnSuccessListener {
             editTextMessage.text.clear()
             rvChat.scrollToPosition(adapter.itemCount - 1)
         }
         toref.push().setValue(chatmessage)
+        latestFromRef.setValue(chatmessage)
+        latestToRef.setValue(chatmessage)
     }
 
     private fun listenForMessages() {
