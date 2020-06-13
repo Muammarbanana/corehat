@@ -60,6 +60,7 @@ class Approval : AppCompatActivity() {
         btnTolak.setOnClickListener {
             val intent = Intent(this, RefusalReason::class.java)
             intent.putExtra("id", idjanji)
+            intent.putExtra("iduser", iduser)
             startActivity(intent)
         }
 

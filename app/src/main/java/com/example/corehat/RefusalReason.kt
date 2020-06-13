@@ -6,8 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.RadioButton
 import androidx.appcompat.app.AlertDialog
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.example.corehat.model.Notifikasi
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_refusal_reason.*
 import kotlinx.android.synthetic.main.pop_alert.view.*
 
@@ -46,6 +47,26 @@ class RefusalReason : AppCompatActivity() {
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
         }
+        val idkonselor = FirebaseAuth.getInstance().uid
+        val datakonselRef = FirebaseDatabase.getInstance().getReference("konselor")
+        datakonselRef.orderByKey().equalTo(idkonselor).addListenerForSingleValueEvent(object:
+            ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                p0.children.forEach {
+                    val namakonselor = it.child("nama").value.toString()
+                    val photo = it.child("url_foto").value.toString()
+                    val iduser = intent.getStringExtra("iduser")
+                    val message = "telah menolak permohonan janji pertemuan kamu."
+                    val time = System.currentTimeMillis()
+                    val notifikasi = Notifikasi(namakonselor, photo, iduser, message, time, 0)
+                    val notifRef = FirebaseDatabase.getInstance().getReference("notifikasi")
+                    notifRef.push().setValue(notifikasi)
+                }
+            }
+        })
     }
 
     private fun popAlert(id: String) {
