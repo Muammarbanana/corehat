@@ -4,8 +4,13 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.RadioButton
 import androidx.appcompat.app.AlertDialog
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.example.corehat.model.Notifikasi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -64,6 +69,36 @@ class RefusalReason : AppCompatActivity() {
                     val notifikasi = Notifikasi(namakonselor, photo, iduser, message, time, 0)
                     val notifRef = FirebaseDatabase.getInstance().getReference("notifikasi")
                     notifRef.push().setValue(notifikasi)
+                }
+            }
+        })
+        sendNotification(intent.getStringExtra("iduser"))
+    }
+
+    private fun sendNotification(iduser: String) {
+        val queue = Volley.newRequestQueue(this)
+        val ref = FirebaseDatabase.getInstance().getReference("tokendevice")
+        ref.orderByKey().equalTo(iduser).addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.exists()) {
+                    for (h in p0.children) {
+                        val token = h.child("token").value.toString()
+                        val message = "Permohonan janji kamu telah ditolak"
+                        val tokenencoded = java.net.URLEncoder.encode(token, "utf-8")
+                        val encodedmessage = java.net.URLEncoder.encode(message, "utf-8").replace("+", "%20")
+                        val url = "https://python-push-notif.herokuapp.com/todo/$tokenencoded/$encodedmessage"
+
+                        val stringRequest = StringRequest(
+                            Request.Method.GET, url,
+                            Response.Listener<String> {
+                            },
+                            Response.ErrorListener { Log.d("Response", "Error Gans") } )
+
+                        queue.add(stringRequest)
+                    }
                 }
             }
         })
