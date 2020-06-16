@@ -48,6 +48,7 @@ class ApprovalConfirmation : AppCompatActivity() {
             }
             ref.child("pesan").setValue(pesan)
             ref.child("status").setValue(1)
+            ref.child("timestamp").setValue(System.currentTimeMillis())
             var intent = Intent(this, Home::class.java)
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent = intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
