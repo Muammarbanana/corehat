@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.corehat.fragments.HomeFragment
 import com.example.corehat.fragments.KonsultasiFragment
 import com.example.corehat.fragments.ProfilFragment
+import com.example.corehat.model.NotifikasiMateri
+import com.example.corehat.model.SubMateriKomplit
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
@@ -37,6 +39,8 @@ class Home : AppCompatActivity() {
 
             false
         }
+
+        checkMateriUpdate()
     }
 
     private fun getPhoto() {
@@ -123,5 +127,99 @@ class Home : AppCompatActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.mainframe, fragment)
         transaction.commit()
+    }
+
+    private fun checkMateriUpdate() {
+        val ref = FirebaseDatabase.getInstance().getReference("submateri")
+        ref.orderByKey().addChildEventListener(object: ChildEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+                val judul = p0.child("judul").value.toString()
+                val submateri = p0.getValue(SubMateriKomplit::class.java)
+                val notifRef = FirebaseDatabase.getInstance().getReference("notifikasi")
+                val time = System.currentTimeMillis()
+                val userRef = FirebaseDatabase.getInstance().getReference("Users")
+                userRef.orderByKey().addListenerForSingleValueEvent(object: ValueEventListener{
+                    override fun onCancelled(p0: DatabaseError) {
+
+                    }
+
+                    override fun onDataChange(p0: DataSnapshot) {
+                        if(p0.exists()) {
+                            p0.children.forEach {
+                                val iduser = it.key.toString()
+                                val notifikasi = NotifikasiMateri(judul, 1, iduser, "Terdapat update pada materi", time, 0, submateri!!)
+                                notifRef.push().setValue(notifikasi)
+                            }
+                        }
+                    }
+
+                })
+            }
+
+            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+
+            }
+
+        })
+
+        var first = true
+        ref.limitToLast(1).addChildEventListener(object: ChildEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+                if (first) {
+                    first = false
+                } else {
+                    val judul = p0.child("judul").value.toString()
+                    val submateri = p0.getValue(SubMateriKomplit::class.java)
+                    val notifRef = FirebaseDatabase.getInstance().getReference("notifikasi")
+                    val time = System.currentTimeMillis()
+                    val userRef = FirebaseDatabase.getInstance().getReference("Users")
+                    userRef.orderByKey().addListenerForSingleValueEvent(object: ValueEventListener{
+                        override fun onCancelled(p0: DatabaseError) {
+
+                        }
+
+                        override fun onDataChange(p0: DataSnapshot) {
+                            if(p0.exists()) {
+                                p0.children.forEach {
+                                    val iduser = it.key.toString()
+                                    val notifikasi = NotifikasiMateri(judul, 1, iduser, "Terdapat materi baru berjudul", time, 0, submateri!!)
+                                    notifRef.push().setValue(notifikasi)
+                                }
+                            }
+                        }
+
+                    })
+                }
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+
+            }
+
+        })
     }
 }
